@@ -1,0 +1,17 @@
+.album {
+    margin: 0 auto;
+    margin-bottom: 2rem;
+}
+
+.album .artist {
+    text-align: center;
+    font-weight: bold;
+}
+
+.album .album-name {
+    text-align: center;
+}
+
+.album .album-cover {
+    margin-bottom: 1rem;
+}
