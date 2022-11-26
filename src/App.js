@@ -10,15 +10,17 @@ function App() {
 
   function openAddForm() {
     setAddForm(true)
+    document.querySelector("html").classList.add("modal-is-open");
   }
 
   function closeAddForm() {
     setAddForm(false);
+    document.querySelector("html").classList.remove("modal-is-open");
   }
   
   
   return (
-    <body>
+    <>
       <Header openAddForm={openAddForm}/>
       <main class="container">
         <div className="App">
@@ -29,7 +31,7 @@ function App() {
           <AlbumAddForm addFormOpened={addFormOpened} closeAddForm={closeAddForm}/>
         </div>
       </main>
-    </body>
+    </>
   );
 }
 
