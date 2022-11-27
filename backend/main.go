@@ -39,7 +39,7 @@ func main() {
 	}))
 
 	r.Get("/albums", albumList)
-	r.Post("/albums/add", albumAdd)
+	r.Post("/albums/new", albumAdd)
 
 	fmt.Println("serving on :8080...")
 	http.ListenAndServe(":8080", r)
@@ -56,7 +56,13 @@ func albumList(w http.ResponseWriter, r *http.Request) {
 }
 
 func albumAdd(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("not implemented"))
+	dec := json.NewDecoder(r.Body)
+	newAlbum := Album{}
+	err := dec.Decode(&newAlbum)
+	if err != nil {
+		fmt.Sprint(w, err)
+	}
+	albums = append(albums, newAlbum)
 }
 
 func JsonMiddleware(next http.Handler) http.Handler {
