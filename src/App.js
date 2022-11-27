@@ -17,6 +17,8 @@ function App() {
     setAddForm(false);
     document.querySelector("html").classList.remove("modal-is-open");
   }
+
+  
   
   
   return (
