@@ -1,3 +1,7 @@
 .album-add-form footer {
     margin-top: 0;
 }
+
+.cancel-button {
+    width: 100%;
+}

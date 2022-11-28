@@ -1,6 +1,5 @@
 import Album from "./Album";
 import "./AlbumList.css";
-import { useState, useEffect } from "react";
 
 function AlbumList({albums}) {
 
