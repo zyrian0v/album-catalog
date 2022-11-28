@@ -2,16 +2,7 @@ import Album from "./Album";
 import "./AlbumList.css";
 import { useState, useEffect } from "react";
 
-function AlbumList() {
-    const [albums, setAlbums] = useState([]);
-
-    useEffect(() => {
-        fetch("http://localhost:8080/albums")
-            .then(res => res.json())
-            .then(json => setAlbums(json))
-    }, []);
-    
-
+function AlbumList({albums}) {
 
     return (
         <div className="album-list grid">

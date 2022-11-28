@@ -1,20 +1,7 @@
 import "./AlbumAddForm.css";
 
-function AlbumAddForm({addFormOpened, closeAddForm}) {
+function AlbumAddForm({sendNewAlbum, addFormOpened, closeAddForm, setAlbums}) {
 
-    function sendNewAlbum() {
-        const form = document.querySelector("#albumAddForm")
-        const data = new FormData(form);
-        const json = Object.fromEntries(data);
-        console.log(json)
-        fetch("http://localhost:8080/albums/new", {
-            method: "POST",
-            body: JSON.stringify(json),
-        })
-
-        closeAddForm();
-    }
-    
     return (
         <dialog className="album-add-form" open={addFormOpened}>
             <article>
