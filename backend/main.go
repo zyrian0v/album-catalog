@@ -10,6 +10,7 @@ import (
 	"os"
 	"io"
 	"log"
+	"strconv"
 )
 
 type Album struct {
@@ -42,6 +43,7 @@ func main() {
 
 	r.Get("/albums", JsonContentType(albumList))
 	r.Post("/albums/new", JsonContentType(albumAdd))
+	r.Delete("/albums/{id}/delete", albumDelete)
 
 	fs := http.FileServer(http.Dir("./covers"))
 	fs2 := http.StripPrefix("/covers", fs)
@@ -86,14 +88,12 @@ func albumAdd(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 	diskFile, err := os.Create("covers/"+header.Filename)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 	_, err = io.Copy(diskFile, f)
 	if err != nil {
 		log.Println(err)
@@ -106,27 +106,21 @@ func albumAdd(w http.ResponseWriter, r *http.Request) {
 	albums = append(albums, newAlbum)
 }
 
-func albumCoverAdd(w http.ResponseWriter, r *http.Request) {
-	f, header, err := r.FormFile("cover")
+func albumDelete(w http.ResponseWriter, r *http.Request) {
+	idParam := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idParam)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	diskFile, err := os.Create("covers/"+header.Filename)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	
+	var newAlbums = []Album{}
+	for i, v := range albums {
+		if v.Id != id {
+			newAlbums = append(newAlbums, albums[i])
+		}
 	}
-
-	_, err = io.Copy(diskFile, f)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	albums = newAlbums
 }
-
 

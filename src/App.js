@@ -39,7 +39,7 @@ function App() {
                 <div className="App">
                     <p>Here are you favorite albums.</p>
 
-                    <AlbumList albums={albums}/>
+                    <AlbumList albums={albums} setAlbums={setAlbums}/>
 
                     <AlbumAddForm addFormOpened={addFormOpened} 
                                   closeAddForm={closeAddForm} 

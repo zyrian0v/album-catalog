@@ -15,3 +15,16 @@
 .album .album-cover {
     margin-bottom: 1rem;
 }
+
+.album .album-settings {
+    text-align: right;
+    visibility: hidden;
+}
+
+.album .album-settings a {
+    text-decoration: none;
+}
+
+.album:hover .album-settings {
+    visibility: visible;
+}
