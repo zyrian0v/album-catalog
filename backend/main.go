@@ -7,6 +7,9 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
 	"net/http"
+	"os"
+	"io"
+	"log"
 )
 
 type Album struct {
@@ -26,7 +29,6 @@ var albums = []Album{
 func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
-	r.Use(JsonMiddleware)
 	r.Use(cors.Handler(cors.Options{
 		// AllowedOrigins:   []string{"https://foo.com"}, // Use this to allow specific origin hosts
 		AllowedOrigins: []string{"https://*", "http://*"},
@@ -38,12 +40,24 @@ func main() {
 		MaxAge:           300, // Maximum value not ignored by any of major browsers
 	}))
 
-	r.Get("/albums", albumList)
-	r.Post("/albums/new", albumAdd)
+	r.Get("/albums", JsonContentType(albumList))
+	r.Post("/albums/new", JsonContentType(albumAdd))
+
+	fs := http.FileServer(http.Dir("./covers"))
+	fs2 := http.StripPrefix("/covers", fs)
+	r.Get("/covers/*", fs2.ServeHTTP)
 
 	fmt.Println("serving on :8080...")
 	http.ListenAndServe(":8080", r)
 }
+
+func JsonContentType(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		next(w, r)
+	}
+}
+
 
 func albumList(w http.ResponseWriter, r *http.Request) {
 	b, err := json.Marshal(albums)
@@ -56,18 +70,63 @@ func albumList(w http.ResponseWriter, r *http.Request) {
 }
 
 func albumAdd(w http.ResponseWriter, r *http.Request) {
-	dec := json.NewDecoder(r.Body)
+	jsons := r.FormValue("json")
 	newAlbum := Album{}
-	err := dec.Decode(&newAlbum)
+	err := json.Unmarshal([]byte(jsons), &newAlbum)
+	newAlbum.Id = len(albums)
 	if err != nil {
-		fmt.Sprint(w, err)
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
+
+	f, header, err := r.FormFile("cover")
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	diskFile, err := os.Create("covers/"+header.Filename)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	_, err = io.Copy(diskFile, f)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	newAlbum.Cover = header.Filename
+	
 	albums = append(albums, newAlbum)
 }
 
-func JsonMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		next.ServeHTTP(w, r)
-	})
+func albumCoverAdd(w http.ResponseWriter, r *http.Request) {
+	f, header, err := r.FormFile("cover")
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	diskFile, err := os.Create("covers/"+header.Filename)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	_, err = io.Copy(diskFile, f)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
+
+

@@ -28,21 +28,9 @@ function App() {
         document.querySelector("html").classList.remove("modal-is-open");
     }
 
-    function submitNewAlbum(event) {
-        event.preventDefault();
-
-        const data = new FormData(event.target);
-        const json = Object.fromEntries(data);
-        json.id = albums.length
-        fetch("http://localhost:8080/albums/new", {
-            method: "POST",
-            body: JSON.stringify(json),
-        })
-        .then(res => setUpdated(updated + 1))
-
-        closeAddForm();
+    function updateAlbumList() {
+        setUpdated(updated + 1)
     }
-
 
     return (
         <>
@@ -53,7 +41,9 @@ function App() {
 
                     <AlbumList albums={albums}/>
 
-                    <AlbumAddForm submitNewAlbum={submitNewAlbum} addFormOpened={addFormOpened} closeAddForm={closeAddForm}/>
+                    <AlbumAddForm addFormOpened={addFormOpened} 
+                                  closeAddForm={closeAddForm} 
+                                  updateAlbumList={updateAlbumList}/>
                 </div>
             </main>
         </>
