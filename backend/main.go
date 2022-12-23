@@ -20,10 +20,10 @@ type Album struct {
 }
 
 var albums = []Album{
-	{0, "Nirvana", "Nevermind", "nevermind.jpg"},
-	{1, "Trementina", "Almost Reach The Sun", "reach_the_sun.jpg"},
-	{2, "Death Grips", "The Money Store", "the_money_store.jpg"},
-	{3, "Ride", "Nowhere", "ride.jpg"},
+	{0, "Nirvana", "Nevermind", ""},
+	{1, "Trementina", "Almost Reach The Sun", "almost_reach_the_sun.jpg"},
+	{2, "Death Grips", "The Money Store", ""},
+	{3, "Ride", "Nowhere", "almost_reach_the_sun.jpg"},
 }
 
 func main() {
