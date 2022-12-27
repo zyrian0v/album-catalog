@@ -6,10 +6,10 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
-	"net/http"
-	"os"
 	"io"
 	"log"
+	"net/http"
+	"os"
 	"strconv"
 )
 
@@ -60,7 +60,6 @@ func JsonContentType(next http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-
 func albumList(w http.ResponseWriter, r *http.Request) {
 	b, err := json.Marshal(albums)
 	if err != nil {
@@ -82,27 +81,29 @@ func albumAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var filename string
 	f, header, err := r.FormFile("cover")
 	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	diskFile, err := os.Create("covers/"+header.Filename)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	_, err = io.Copy(diskFile, f)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		filename = ""
+	} else {
+		filename = buildFileName(header.Filename)
+
+		diskFile, err := os.Create("covers/" + filename)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		_, err = io.Copy(diskFile, f)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
-	newAlbum.Cover = header.Filename
-	
+	newAlbum.Cover = filename
+
 	albums = append(albums, newAlbum)
 }
 
@@ -114,13 +115,20 @@ func albumDelete(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	
+
 	var newAlbums = []Album{}
+	var deletedAlbum Album
 	for i, v := range albums {
 		if v.Id != id {
 			newAlbums = append(newAlbums, albums[i])
+		} else {
+			deletedAlbum = v
 		}
 	}
 	albums = newAlbums
+
+	if deletedAlbum.Cover != "" {
+		os.Remove("covers/" + deletedAlbum.Cover)
+	}
 }
 

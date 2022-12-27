@@ -24,7 +24,12 @@ function AlbumAddForm({addFormOpened, closeAddForm, updateAlbumList}) {
         })
         .then(res => updateAlbumList())
 
+
         closeAddForm();
+
+
+        setArtist("");
+        setName("");
     }
 
     return (
@@ -36,16 +41,19 @@ function AlbumAddForm({addFormOpened, closeAddForm, updateAlbumList}) {
                         <h3>Add an album</h3>
                         <label for="artist">Artist</label>
                         <input type="artist" id="artist" name="artist" required
-                            onChange={(e) => setArtist(e.target.value)}/>
+                            onChange={(e) => setArtist(e.target.value)}
+                            value={artist}/>
 
 
                         <label for="name">Album name</label>
                         <input type="name" id="name" name="name" required
-                            onChange={(e) => setName(e.target.value)}/>
+                            onChange={(e) => setName(e.target.value)}
+                            value={name}/>
 
                         <label for="cover">Cover
                             <input accept="image/png, image/jpeg" type="file" id="cover" name="cover"
-                                onChange={(e) => setCover(e.target.files[0])}/>
+                                onChange={(e) => setCover(e.target.files[0])}
+                                />
                         </label>
 
                         <footer>
