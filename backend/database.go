@@ -35,7 +35,7 @@ func DBopenConnection() *sql.DB {
 }
 
 func DBSetup() {
-	setupSql, err := os.ReadFile("db/setup.sql")
+	setupSql, err := os.ReadFile("sql/schema.sql")
 	if err != nil {
 		log.Fatal(err)
 	}
