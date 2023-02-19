@@ -12,10 +12,17 @@ function AlbumList({albums, setAlbums}) {
         setAlbums(albums.filter(v => v.id != id))
     }
 
+    
+    let albumList;
+    if (albums.length != 0) {
+        albumList = albums.map(v => <Album key={v.id} data={v} deleteAlbum={deleteAlbum}/>);
+    } else {
+        albumList = <p>The list is empty.</p>;
+    }
 
     return (
         <div className="album-list grid">
-            {albums.map(v => <Album key={v.id} data={v} deleteAlbum={deleteAlbum}/>)}
+            {albumList}
         </div>
     );
 }
