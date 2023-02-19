@@ -20,13 +20,6 @@ type Album struct {
 	Cover  string `json:"cover"`
 }
 
-var albums = []Album{
-	{0, "Nirvana", "Nevermind", ""},
-	{1, "Trementina", "Almost Reach The Sun", ""},
-	{2, "Death Grips", "The Money Store", ""},
-	{3, "Ride", "Nowhere", ""},
-}
-
 func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -61,17 +54,16 @@ func JsonContentType(next http.HandlerFunc) http.HandlerFunc {
 }
 
 func albumList(w http.ResponseWriter, r *http.Request) {
-	as, err := listAlbums()
+	as, err := DBListAlbums()
 	if err != nil {
-		fmt.Sprint(w, err)
 		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	b, err := json.Marshal(as)
 	if err != nil {
-		fmt.Sprint(w, err)
 		log.Println(err)
-
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -82,7 +74,6 @@ func albumAdd(w http.ResponseWriter, r *http.Request) {
 	jsons := r.FormValue("json")
 	newAlbum := Album{}
 	err := json.Unmarshal([]byte(jsons), &newAlbum)
-	newAlbum.Id = len(albums)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -112,7 +103,12 @@ func albumAdd(w http.ResponseWriter, r *http.Request) {
 
 	newAlbum.Cover = filename
 
-	albums = append(albums, newAlbum)
+	err = DBAddAlbum(newAlbum)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func albumDelete(w http.ResponseWriter, r *http.Request) {
@@ -124,18 +120,21 @@ func albumDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var newAlbums = []Album{}
-	var deletedAlbum Album
-	for i, v := range albums {
-		if v.Id != id {
-			newAlbums = append(newAlbums, albums[i])
-		} else {
-			deletedAlbum = v
-		}
+	a, err := DBGetAlbum(id)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-	albums = newAlbums
 
-	if deletedAlbum.Cover != "" {
-		os.Remove("covers/" + deletedAlbum.Cover)
+	if a.Cover != "" {
+		os.Remove("covers/" + a.Cover)
+	}
+
+	err = DBDeleteAlbum(id)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 }

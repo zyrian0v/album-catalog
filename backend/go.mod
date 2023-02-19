@@ -1,4 +1,4 @@
-module 00.id.lv/album-backend
+module albumbackend
 
 go 1.18
 

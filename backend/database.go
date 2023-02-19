@@ -8,19 +8,19 @@ import (
 	_ "rsc.io/sqlite"
 )
 
-var db *sql.DB
+var handle *sql.DB
 
 func init() {
-	db = openConnection()
+	handle = DBopenConnection()
 
 	setupdb := flag.Bool("setupdb", false, "use this to setup schema for an empty database")
 	flag.Parse()
 	if *setupdb == true {
-		setupDatabase()
+		DBSetup()
 	}
 }
 
-func openConnection() *sql.DB {
+func DBopenConnection() *sql.DB {
 	db, err := sql.Open("sqlite3", "db.sqlite3")
 	if err != nil {
 		log.Fatal(err)
@@ -34,25 +34,25 @@ func openConnection() *sql.DB {
 	return db
 }
 
-func setupDatabase() {
-	setupSql, err := os.ReadFile("sql/setup.sql")
+func DBSetup() {
+	setupSql, err := os.ReadFile("db/setup.sql")
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = db.Exec(string(setupSql))
+	_, err = handle.Exec(string(setupSql))
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func listAlbums() (as []Album, err error) {
+func DBListAlbums() (as []Album, err error) {
 	stmt := "SELECT id, artist, name, cover FROM albums;"
-	rows, err := db.Query(stmt)
+	rows, err := handle.Query(stmt)
 	if err != nil {
-		return 
+		return
 	}
 	defer rows.Close()
-	
+
 	for rows.Next() {
 		a := Album{}
 		err = rows.Scan(&a.Id, &a.Artist, &a.Name, &a.Cover)
@@ -62,4 +62,22 @@ func listAlbums() (as []Album, err error) {
 		as = append(as, a)
 	}
 	return
+}
+
+func DBGetAlbum(id int) (a Album, err error) {
+	stmt := `SELECT id, artist, name, cover FROM albums WHERE id = ?`
+	err = handle.QueryRow(stmt, id).Scan(&a.Id, &a.Artist, &a.Name, &a.Cover)
+	return
+}
+
+func DBAddAlbum(a Album) error {
+	stmt := `INSERT INTO albums (artist, name, cover) VALUES (?, ?, ?); `
+	_, err := handle.Exec(stmt, a.Artist, a.Name, a.Cover)
+	return err
+}
+
+func DBDeleteAlbum(id int) error {
+	stmt := `DELETE FROM albums WHERE id = ?`
+	_, err := handle.Exec(stmt, id)
+	return err
 }
