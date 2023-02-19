@@ -22,9 +22,9 @@ type Album struct {
 
 var albums = []Album{
 	{0, "Nirvana", "Nevermind", ""},
-	{1, "Trementina", "Almost Reach The Sun", "almost_reach_the_sun.jpg"},
+	{1, "Trementina", "Almost Reach The Sun", ""},
 	{2, "Death Grips", "The Money Store", ""},
-	{3, "Ride", "Nowhere", "almost_reach_the_sun.jpg"},
+	{3, "Ride", "Nowhere", ""},
 }
 
 func main() {
@@ -61,9 +61,17 @@ func JsonContentType(next http.HandlerFunc) http.HandlerFunc {
 }
 
 func albumList(w http.ResponseWriter, r *http.Request) {
-	b, err := json.Marshal(albums)
+	as, err := listAlbums()
 	if err != nil {
 		fmt.Sprint(w, err)
+		log.Println(err)
+		return
+	}
+	b, err := json.Marshal(as)
+	if err != nil {
+		fmt.Sprint(w, err)
+		log.Println(err)
+
 		return
 	}
 
@@ -131,4 +139,3 @@ func albumDelete(w http.ResponseWriter, r *http.Request) {
 		os.Remove("covers/" + deletedAlbum.Cover)
 	}
 }
-
