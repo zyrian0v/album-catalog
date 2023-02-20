@@ -1,14 +1,46 @@
-import "./AlbumAddForm.css";
+import "./AlbumForm.css";
 import { useState } from "react";
 
-function AlbumAddForm({addFormOpened, closeAddForm, updateAlbumList}) {
+function AlbumForm({formType, formOpened, closeForm, updateAlbumList, selectedAlbum}) {
     const [artist, setArtist] = useState("");
     const [name, setName] = useState("");
     const [cover, setCover] = useState(null);
 
+    if (selectedAlbum && formType === "update") {
+        if (artist !== selectedAlbum.artist) {
+            setArtist(selectedAlbum.artist)
+        }
+
+        if (name !== selectedAlbum.name) {
+            setName(selectedAlbum.name)
+        }
+    }
+
+
+    let header;
+    let submitText;
+    if (formType === "add") {
+        header = "Add an album"
+        submitText = "Add"
+    } else if (formType === "update") {
+        header = "Update an album"
+        submitText = "Update"
+    }
+
+
+    function submitForm(event) {
+        event.preventDefault()
+
+        if (formType === "add") {
+            submitNewAlbum(event);
+        } else if (formType === "update") {
+            submitUpdatedAlbum(event)
+        } else {
+            console.error("incorrect form type");
+        }
+    }
 
     function submitNewAlbum(event) {
-        event.preventDefault();
         
         const json = {
             artist: artist,
@@ -25,26 +57,29 @@ function AlbumAddForm({addFormOpened, closeAddForm, updateAlbumList}) {
         .then(res => updateAlbumList())
 
 
-        closeAddForm();
+        closeForm();
 
 
         setArtist("");
         setName("");
     }
 
-    return (
-        <dialog className="album-add-form" open={addFormOpened}>
-                <form onSubmit={submitNewAlbum} id="albumAddForm" enctype="multipart/form-data">
-                    <article>
-                        <a onClick={closeAddForm} href="#close" aria-label="Close" class="close"></a>
+    function submitUpdatedAlbum(event) {
+        alert("updating album...")
+        closeForm();
+    }
 
-                        <h3>Add an album</h3>
+    return (
+        <dialog className="album-add" open={formOpened}>
+                <form onSubmit={submitForm} id="albumForm" enctype="multipart/form-data">
+                    <article>
+                        <a onClick={closeForm} href="#close" aria-label="Close" class="close"></a>
+
+                        <h3>{header}</h3>
                         <label for="artist">Artist</label>
                         <input type="artist" id="artist" name="artist" required
                             onChange={(e) => setArtist(e.target.value)}
                             value={artist}/>
-
-
                         <label for="name">Album name</label>
                         <input type="name" id="name" name="name" required
                             onChange={(e) => setName(e.target.value)}
@@ -57,8 +92,8 @@ function AlbumAddForm({addFormOpened, closeAddForm, updateAlbumList}) {
                         </label>
 
                         <footer>
-                            <button>Submit</button>
-                            <a onClick={closeAddForm} href="#cancel" className="secondary cancel-button" role="button">Cancel</a>
+                            <button>{submitText}</button>
+                            <a onClick={closeForm} href="#cancel" className="secondary cancel-button" role="button">Cancel</a>
                         </footer>
                     </article>
                 </form>
@@ -66,4 +101,4 @@ function AlbumAddForm({addFormOpened, closeAddForm, updateAlbumList}) {
     );
 }
 
-export default AlbumAddForm;
+export default AlbumForm;

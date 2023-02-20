@@ -2,12 +2,14 @@ import logo from './logo.svg';
 import './App.css';
 import Header from "./Header";
 import AlbumList from "./AlbumList";
-import AlbumAddForm from './AlbumAddForm';
+import AlbumForm from './AlbumForm';
 import { useState, useEffect } from "react";
 
 
 function App() {
-    const [addFormOpened, setAddForm] = useState(false);
+    const [addFormOpened, setAddFormOpened] = useState(false);
+    const [updateFormOpened, setUpdateFormOpened] = useState(false);
+    const [selectedAlbum, setSelectedAlbum] = useState(null);
     const [albums, setAlbums] = useState([]);
     const [updated, setUpdated] = useState(false);
 
@@ -19,14 +21,27 @@ function App() {
 
 
     function openAddForm() {
-        setAddForm(true)
+        setAddFormOpened(true)
         document.querySelector("html").classList.add("modal-is-open");
     }
 
     function closeAddForm() {
-        setAddForm(false);
+        setAddFormOpened(false);
         document.querySelector("html").classList.remove("modal-is-open");
     }
+
+
+    function openUpdateForm(album) {
+        setSelectedAlbum(album);
+        setUpdateFormOpened(true);
+        document.querySelector("html").classList.add("modal-is-open");
+    }
+
+    function closeUpdateForm() {
+        setUpdateFormOpened(false);
+        document.querySelector("html").classList.remove("modal-is-open");
+    }
+
 
     function updateAlbumList() {
         setUpdated(updated + 1)
@@ -39,11 +54,19 @@ function App() {
                 <div className="App">
                     <p>Here are you favorite albums.</p>
 
-                    <AlbumList albums={albums} setAlbums={setAlbums}/>
+                    <AlbumList albums={albums} setAlbums={setAlbums} openUpdateForm={openUpdateForm}/>
 
-                    <AlbumAddForm addFormOpened={addFormOpened} 
-                                  closeAddForm={closeAddForm} 
-                                  updateAlbumList={updateAlbumList}/>
+                    <AlbumForm formType="add"
+                               formOpened={addFormOpened} 
+                               closeForm={closeAddForm} 
+                               updateAlbumList={updateAlbumList}/>
+
+                    <AlbumForm formType="update"
+                               formOpened={updateFormOpened} 
+                               closeForm={closeUpdateForm} 
+                               selectedAlbum={selectedAlbum}
+                               updateAlbumList={updateAlbumList}/>
+
                 </div>
             </main>
         </>

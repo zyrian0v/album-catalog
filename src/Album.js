@@ -1,7 +1,6 @@
-// import cover from "./cover_example.jpg";
 import "./Album.css";
 
-function Album({data, deleteAlbum}) {
+function Album({data, deleteAlbum, updateAlbum}) {
     
 
     let cover = "";
@@ -14,7 +13,7 @@ function Album({data, deleteAlbum}) {
     return (
         <div className="album">
             <div className="album-settings">
-                <a href="#">✎</a>
+                <a onClick={() => updateAlbum(data.id)} href="#">✎</a>
                 <a onClick={() => deleteAlbum(data.id)} href="#">✖</a>
             </div>
             <img className="album-cover" height="250" width="250" src={cover} alt="album cover"></img>
