@@ -76,6 +76,16 @@ func DBAddAlbum(a Album) error {
 	return err
 }
 
+func DBUpdateAlbum(id int, a Album) error {
+	stmt := `UPDATE albums 
+	SET artist = ?,
+	name = ?,
+	cover = ?
+	WHERE id = ?;`
+	_, err := handle.Exec(stmt, a.Artist, a.Name, a.Cover, id)
+	return err
+}
+
 func DBDeleteAlbum(id int) error {
 	stmt := `DELETE FROM albums WHERE id = ?`
 	_, err := handle.Exec(stmt, id)

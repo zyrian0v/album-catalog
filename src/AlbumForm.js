@@ -2,11 +2,16 @@ import "./AlbumForm.css";
 import { useState } from "react";
 
 function AlbumForm({formType, formOpened, closeForm, updateAlbumList, selectedAlbum}) {
+    const [id, setId] = useState(null);
     const [artist, setArtist] = useState("");
     const [name, setName] = useState("");
     const [cover, setCover] = useState(null);
 
     if (selectedAlbum && formType === "update") {
+        if (id !== selectedAlbum.id) {
+            setId(selectedAlbum.id)
+        }
+        
         if (artist !== selectedAlbum.artist) {
             setArtist(selectedAlbum.artist)
         }
@@ -31,17 +36,6 @@ function AlbumForm({formType, formOpened, closeForm, updateAlbumList, selectedAl
     function submitForm(event) {
         event.preventDefault()
 
-        if (formType === "add") {
-            submitNewAlbum(event);
-        } else if (formType === "update") {
-            submitUpdatedAlbum(event)
-        } else {
-            console.error("incorrect form type");
-        }
-    }
-
-    function submitNewAlbum(event) {
-        
         const json = {
             artist: artist,
             name: name,
@@ -49,25 +43,28 @@ function AlbumForm({formType, formOpened, closeForm, updateAlbumList, selectedAl
         const form = new FormData();
         form.append("json", JSON.stringify(json));
         form.append("cover", cover);
-        console.log(json)
-        fetch("http://localhost:8080/albums/new", {
-            method: "POST",
-            body: form,
-        })
-        .then(res => updateAlbumList())
-
+        
+        let request;
+        if (formType === "add") {
+            request = fetch("http://localhost:8080/albums/new", {
+                method: "POST",
+                body: form,
+            })
+        } else if (formType === "update") {
+            request = fetch(`http://localhost:8080/albums/${id}/update`, {
+                method: "POST",
+                body: form,
+            })
+        }
+        request.then(res => updateAlbumList())
+        
 
         closeForm();
-
 
         setArtist("");
         setName("");
     }
 
-    function submitUpdatedAlbum(event) {
-        alert("updating album...")
-        closeForm();
-    }
 
     return (
         <dialog className="album-add" open={formOpened}>

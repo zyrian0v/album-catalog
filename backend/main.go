@@ -6,7 +6,6 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
-	"io"
 	"log"
 	"net/http"
 	"os"
@@ -36,6 +35,7 @@ func main() {
 
 	r.Get("/albums", JsonContentType(albumList))
 	r.Post("/albums/new", JsonContentType(albumAdd))
+	r.Post("/albums/{id}/update", JsonContentType(albumUpdate))
 	r.Delete("/albums/{id}/delete", albumDelete)
 
 	fs := http.FileServer(http.Dir("./covers"))
@@ -80,30 +80,49 @@ func albumAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var filename string
-	f, header, err := r.FormFile("cover")
+	filename, err := saveCoverFile(r)
 	if err != nil {
-		filename = ""
-	} else {
-		filename = buildFileName(header.Filename)
-
-		diskFile, err := os.Create("covers/" + filename)
-		if err != nil {
-			log.Println(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		_, err = io.Copy(diskFile, f)
-		if err != nil {
-			log.Println(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
-
 	newAlbum.Cover = filename
 
 	err = DBAddAlbum(newAlbum)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func albumUpdate(w http.ResponseWriter, r *http.Request) {
+	jsons := r.FormValue("json")
+	updatedAlbum := Album{}
+	err := json.Unmarshal([]byte(jsons), &updatedAlbum)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	filename, err := saveCoverFile(r)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	updatedAlbum.Cover = filename
+
+	idParam := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	err = DBUpdateAlbum(id, updatedAlbum)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -29,13 +29,9 @@ function AlbumList({albums, setAlbums, openUpdateForm}) {
     }
 
     return (
-        <>
-            <div className="album-list grid">
-                {albumList}
-            </div>
-
-            
-        </>
+        <div className="album-list grid">
+            {albumList}
+        </div>
     );
 }
 
