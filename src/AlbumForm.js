@@ -68,6 +68,20 @@ function AlbumForm({formType, closeForm, updateAlbumList, selectedAlbum}) {
         closeForm();
     }
 
+    function currentCover() {
+        let element = "";
+        if (selectedAlbum.cover !== "") {
+            element = (
+                <span>
+                    Currently: <a href={`http://localhost:8080/covers/${selectedAlbum.cover}`}>
+                        {selectedAlbum.cover}
+                    </a>
+                </span>
+            );
+        }
+        return element;
+    }
+
 
     return (
         <dialog className="album-add" open>
@@ -85,11 +99,13 @@ function AlbumForm({formType, closeForm, updateAlbumList, selectedAlbum}) {
                             onChange={(e) => setName(e.target.value)}
                             value={name}/>
 
-                        <label for="cover">Cover
-                            <input accept="image/png, image/jpeg" type="file" id="cover" name="cover"
-                                onChange={(e) => setCover(e.target.files[0])}
-                                />
-                        </label>
+                        <label for="cover">Cover</label>
+
+                        {formType === "update" ? currentCover() : ""} 
+
+                        <input accept="image/png, image/jpeg" type="file" id="cover" name="cover"
+                            onChange={(e) => setCover(e.target.files[0])}
+                            />
 
                         <footer>
                             <button>{submitText}</button>
