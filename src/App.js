@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import './App.css';
 import Header from "./Header";
 import AlbumList from "./AlbumList";
@@ -56,16 +55,14 @@ function App() {
 
                     <AlbumList albums={albums} setAlbums={setAlbums} openUpdateForm={openUpdateForm}/>
 
-                    <AlbumForm formType="add"
-                               formOpened={addFormOpened} 
+                    {addFormOpened ? <AlbumForm formType="add"
                                closeForm={closeAddForm} 
-                               updateAlbumList={updateAlbumList}/>
+                               updateAlbumList={updateAlbumList}/> : ""}
 
-                    <AlbumForm formType="update"
-                               formOpened={updateFormOpened} 
+                    {updateFormOpened ? <AlbumForm formType="update"
                                closeForm={closeUpdateForm} 
                                selectedAlbum={selectedAlbum}
-                               updateAlbumList={updateAlbumList}/>
+                               updateAlbumList={updateAlbumList}/> : ""}
 
                 </div>
             </main>

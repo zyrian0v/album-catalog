@@ -1,26 +1,12 @@
 import "./AlbumForm.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-function AlbumForm({formType, formOpened, closeForm, updateAlbumList, selectedAlbum}) {
+function AlbumForm({formType, closeForm, updateAlbumList, selectedAlbum}) {
     const [id, setId] = useState(null);
     const [artist, setArtist] = useState("");
     const [name, setName] = useState("");
     const [cover, setCover] = useState(null);
-
-    if (selectedAlbum && formType === "update") {
-        if (id !== selectedAlbum.id) {
-            setId(selectedAlbum.id)
-        }
-        
-        if (artist !== selectedAlbum.artist) {
-            setArtist(selectedAlbum.artist)
-        }
-
-        if (name !== selectedAlbum.name) {
-            setName(selectedAlbum.name)
-        }
-    }
-
+    
 
     let header;
     let submitText;
@@ -31,6 +17,26 @@ function AlbumForm({formType, formOpened, closeForm, updateAlbumList, selectedAl
         header = "Update an album"
         submitText = "Update"
     }
+
+    function populateFields() {
+        if (selectedAlbum && formType === "update") {
+            if (id !== selectedAlbum.id) {
+                setId(selectedAlbum.id)
+            }
+            
+            if (artist !== selectedAlbum.artist) {
+                setArtist(selectedAlbum.artist)
+            }
+
+            if (name !== selectedAlbum.name) {
+                setName(selectedAlbum.name)
+            }
+        }
+    }
+
+    useEffect(() => {
+        populateFields()
+    }, [selectedAlbum])
 
 
     function submitForm(event) {
@@ -60,14 +66,11 @@ function AlbumForm({formType, formOpened, closeForm, updateAlbumList, selectedAl
         
 
         closeForm();
-
-        setArtist("");
-        setName("");
     }
 
 
     return (
-        <dialog className="album-add" open={formOpened}>
+        <dialog className="album-add" open>
                 <form onSubmit={submitForm} id="albumForm" enctype="multipart/form-data">
                     <article>
                         <a onClick={closeForm} href="#close" aria-label="Close" class="close"></a>
