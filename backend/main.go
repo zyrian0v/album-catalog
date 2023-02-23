@@ -95,9 +95,24 @@ func albumAdd(w http.ResponseWriter, r *http.Request) {
 }
 
 func albumUpdate(w http.ResponseWriter, r *http.Request) {
+	idParam := chi.URLParam(r, "id")
+	id, err := strconv.Atoi(idParam)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	oldAlbum, err := DBGetAlbum(id)
+	if err != nil {
+		log.Println(err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	jsons := r.FormValue("json")
 	updatedAlbum := Album{}
-	err := json.Unmarshal([]byte(jsons), &updatedAlbum)
+	err = json.Unmarshal([]byte(jsons), &updatedAlbum)
 	if err != nil {
 		log.Println(err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -107,15 +122,9 @@ func albumUpdate(w http.ResponseWriter, r *http.Request) {
 	filename, err := saveCoverFile(r)
 	if err != nil {
 		log.Println(err)
-	}
-	updatedAlbum.Cover = filename
-
-	idParam := chi.URLParam(r, "id")
-	id, err := strconv.Atoi(idParam)
-	if err != nil {
-		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		updatedAlbum.Cover = oldAlbum.Cover
+	} else {
+		updatedAlbum.Cover = filename
 	}
 
 	err = DBUpdateAlbum(id, updatedAlbum)

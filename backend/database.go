@@ -11,7 +11,7 @@ import (
 var handle *sql.DB
 
 func init() {
-	handle = DBopenConnection()
+	handle = DBOpenConnection()
 
 	setupdb := flag.Bool("setupdb", false, "use this to setup schema for an empty database")
 	flag.Parse()
@@ -20,7 +20,7 @@ func init() {
 	}
 }
 
-func DBopenConnection() *sql.DB {
+func DBOpenConnection() *sql.DB {
 	db, err := sql.Open("sqlite3", "db.sqlite3")
 	if err != nil {
 		log.Fatal(err)
