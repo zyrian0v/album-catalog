@@ -83,8 +83,6 @@ func albumAdd(w http.ResponseWriter, r *http.Request) {
 	filename, err := saveCoverFile(r)
 	if err != nil {
 		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
 	}
 	newAlbum.Cover = filename
 
@@ -109,8 +107,6 @@ func albumUpdate(w http.ResponseWriter, r *http.Request) {
 	filename, err := saveCoverFile(r)
 	if err != nil {
 		log.Println(err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
 	}
 	updatedAlbum.Cover = filename
 
