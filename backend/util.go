@@ -1,12 +1,12 @@
 package main
 
 import (
+	"io"
+	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
-	"net/http"
-	"os"
-	"io"
 )
 
 func buildFileName(filename string) string {

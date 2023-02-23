@@ -7,4 +7,4 @@ require (
 	github.com/go-chi/cors v1.2.1
 )
 
-require rsc.io/sqlite v1.0.0 // indirect
+require rsc.io/sqlite v1.0.0

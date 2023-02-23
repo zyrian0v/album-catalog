@@ -5,6 +5,7 @@ import (
 	"flag"
 	"log"
 	"os"
+
 	_ "rsc.io/sqlite"
 )
 
